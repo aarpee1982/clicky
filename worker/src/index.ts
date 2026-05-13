@@ -50,14 +50,20 @@ export default {
 
 async function handleChat(request: Request, env: Env): Promise<Response> {
   const body = await request.text();
+  const anthropicBeta = request.headers.get("anthropic-beta");
+  const headers: Record<string, string> = {
+    "x-api-key": env.ANTHROPIC_API_KEY,
+    "anthropic-version": "2023-06-01",
+    "content-type": "application/json",
+  };
+
+  if (anthropicBeta) {
+    headers["anthropic-beta"] = anthropicBeta;
+  }
 
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
-    headers: {
-      "x-api-key": env.ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01",
-      "content-type": "application/json",
-    },
+    headers,
     body,
   });
 
